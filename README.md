@@ -1,4 +1,7 @@
-# speech-gold-alignments
+# SpeechAlign: a Framework for Speech Translation Alignment Evaluation
+
+[\[Paper\]](https://arxiv.org/abs/2309.11585)
+
 
 Download the original dataset (Vilar et al., 2006) from [here](https://www-i6.informatik.rwth-aachen.de/goldAlignment/)
 
