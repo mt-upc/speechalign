@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+# Code based on the original Jupyter Notebook developed by Aleix Sant
+
 import os
 import io
 import gc
 import re
 import json
 import random
+import shutil
 import numpy as np
 from pathlib import Path
 from itertools import groupby
@@ -381,6 +384,11 @@ def words_postprocessing(words: List[str]):
 
 
 def main():
+
+    ROOT = Path("./dataset").absolute()
+    NUM_SPEAKERS = 5
+    SAMPLE_RATE = 16_000
+
     gpu = torch.cuda.is_available()
 
     en_tts_single = TTS("tts_models/en/ljspeech/vits", gpu=gpu)
@@ -412,7 +420,7 @@ def main():
 
     md = MosesDetokenizer(lang="en")
 
-    with open("en", "r", encoding="iso-8859-1") as file:
+    with open(ROOT / "en", "r", encoding="iso-8859-1") as file:
         sentences = file.read().splitlines()
 
     # Exclude empty lines at the end
@@ -421,11 +429,6 @@ def main():
 
     all_speakers = list(en_tts_multi.speakers)
     all_speakers[0] = "ED"
-
-    NUM_SPEAKERS = 5
-    ROOT = "./"
-    SAMPLE_RATE = 16_000
-    ROOT = Path(ROOT).absolute()
 
     sent_pho_dur = []
     dataset_ini_end_clips = []
@@ -549,16 +552,16 @@ def main():
         del sent_dic
 
     merged_dict = {}
-    for name in os.listdir(jsons_filepath):
-        with open(f"/content/jsons/{name}", encoding="UTF-8") as file:
+    for json_f in jsons_filepath.iterdir():
+        with open(json_f, encoding="UTF-8") as file:
             json_sent = json.load(file)
         merged_dict = {**merged_dict, **json_sent}
 
     dataset = merged_dict
 
-    with open("en_dataset.json", "w", encoding="utf-8") as file:
+    with open(ROOT / "en_dataset.json", "w", encoding="utf-8") as file:
         json.dump(dataset, file, indent=4, ensure_ascii=False)
-
+    shutil.rmtree(jsons_filepath)
 
 if __name__ == "__main__":
     main()
