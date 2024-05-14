@@ -61,3 +61,19 @@ apptainer exec --nv \
     docker://ghcr.io/coqui-ai/tts-cpu:e5fb0d96279af9dc620add6c2e69992c8abd7f24 \
     bash ./generate_dataset.sh
 ```
+
+### Compute AER
+Before obtaining the word-AER (Alignment Error Rate) metric, it is necessary to generate contributions maps for each sentence in the Speech Gold Alignment dataset. These maps should be stored in the .pt format, and each file must be named according to the corresponding sample index in the dataset: {idx}.pt. The sample index should be a three-digit number, such as 001, 011, or 111. The map should not contain contributions for the end of sentence token.
+
+```bash
+python3 speech_aer/aer.py  --test_set_dir /path/to/folder/ \ # path to the Speech Gold Alignment dataset folder.
+                --path_to_contribs /path/to/folder/ \ # path to the folder with token to token contributions. 
+                --path_to_tokenized_targets /path/to/text/file \ # path to txt file with tokenized target sentences
+                --save_alignment_hyp /path/to/text/file \ # path to save the alignments hypotesis.
+                --setting s2s \ # s2s or s2t 
+                --translation_direction en-de \ # en-de or de-en
+```
+
+### Visualize contributions and hard-alignments
+
+The notebook ```speech_aer/visualize_alignment.ipynb``` can be used to obtain heatmaps and visualize the word-word contributions and the hard alignments that are used to compute the AER.
